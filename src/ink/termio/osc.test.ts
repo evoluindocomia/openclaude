@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 const originalEnv = { ...process.env }
 const originalPlatform = process.platform
-const mockedClipboardPath = join(process.cwd(), 'openclaude-clipboard.txt')
+const mockedClipboardPath = join(process.cwd(), 'freecoding-clipboard.txt')
 
 const generateTempFilePathMock = mock(() => mockedClipboardPath)
 

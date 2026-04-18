@@ -12,13 +12,13 @@ const {
   resolveCommandCheckPath,
 } = require('./state');
 const { buildControlCenterViewModel } = require('./presentation');
-const { ChatController, OpenClaudeChatViewProvider, OpenClaudeChatPanelManager } = require('./chat/chatProvider');
+const { ChatController, FreeCodingChatViewProvider, FreeCodingChatPanelManager } = require('./chat/chatProvider');
 const { SessionManager } = require('./chat/sessionManager');
 const { DiffContentProvider, SCHEME: DIFF_SCHEME } = require('./chat/diffController');
 
-const OPENCLAUDE_REPO_URL = 'https://github.com/Gitlawb/openclaude';
-const OPENCLAUDE_SETUP_URL = 'https://github.com/Gitlawb/openclaude/blob/main/README.md#quick-start';
-const PROFILE_FILE_NAME = '.openclaude-profile.json';
+const FREECODING_REPO_URL = 'https://github.com/evoluindocomia/affhub-freecoding';
+const FREECODING_SETUP_URL = 'https://github.com/evoluindocomia/affhub-freecoding/blob/main/README.md#quick-start';
+const PROFILE_FILE_NAME = '.freecoding-profile.json';
 
 function escapeHtml(value) {
   return String(value)
@@ -204,9 +204,9 @@ function readWorkspaceProfile(profilePath) {
 }
 
 async function collectControlCenterState() {
-  const configured = vscode.workspace.getConfiguration('openclaude');
-  const launchCommand = configured.get('launchCommand', 'openclaude');
-  const terminalName = configured.get('terminalName', 'OpenClaude');
+  const configured = vscode.workspace.getConfiguration('freecoding');
+  const launchCommand = configured.get('launchCommand', 'freecoding');
+  const terminalName = configured.get('terminalName', 'FreeCoding');
   const shimEnabled = configured.get('useOpenAIShim', false);
   const executable = getExecutableFromCommand(launchCommand);
   const launchWorkspace = resolveLaunchWorkspace();
@@ -262,11 +262,11 @@ async function collectControlCenterState() {
   };
 }
 
-async function launchOpenClaude(options = {}) {
+async function launchFreeCoding(options = {}) {
   const { requireWorkspace = false } = options;
-  const configured = vscode.workspace.getConfiguration('openclaude');
-  const launchCommand = configured.get('launchCommand', 'openclaude');
-  const terminalName = configured.get('terminalName', 'OpenClaude');
+  const configured = vscode.workspace.getConfiguration('freecoding');
+  const launchCommand = configured.get('launchCommand', 'freecoding');
+  const terminalName = configured.get('terminalName', 'FreeCoding');
   const shimEnabled = configured.get('useOpenAIShim', false);
   const executable = getExecutableFromCommand(launchCommand);
   const launchWorkspace = resolveLaunchWorkspace();
@@ -291,15 +291,15 @@ async function launchOpenClaude(options = {}) {
 
   if (!installed) {
     const action = await vscode.window.showErrorMessage(
-      `OpenClaude command not found: ${executable}. Install it with: npm install -g @gitlawb/openclaude`,
+      `FreeCoding command not found: ${executable}. Install it with: npm install -g @evoluindocomia/affhub-freecoding`,
       'Open Setup Guide',
       'Open Repository',
     );
 
     if (action === 'Open Setup Guide') {
-      await vscode.env.openExternal(vscode.Uri.parse(OPENCLAUDE_SETUP_URL));
+      await vscode.env.openExternal(vscode.Uri.parse(FREECODING_SETUP_URL));
     } else if (action === 'Open Repository') {
-      await vscode.env.openExternal(vscode.Uri.parse(OPENCLAUDE_REPO_URL));
+      await vscode.env.openExternal(vscode.Uri.parse(FREECODING_REPO_URL));
     }
 
     return;
@@ -307,6 +307,7 @@ async function launchOpenClaude(options = {}) {
 
   const env = {};
   if (shimEnabled) {
+    env.FREECODING_USE_OPENAI = '1';
     env.CLAUDE_CODE_USE_OPENAI = '1';
   }
 
@@ -423,7 +424,7 @@ function getWorkspaceRootActionDetail(status, fallbackDetail) {
   }
 
   if (status.launchActionsShareTargetReason === 'relative-launch-command') {
-    return `Same workspace-root target as Launch OpenClaude because the relative command resolves from the workspace root · ${status.workspaceRootCwdLabel}`;
+    return `Same workspace-root target as Launch FreeCoding because the relative command resolves from the workspace root · ${status.workspaceRootCwdLabel}`;
   }
 
   return `Always starts at the workspace root · ${status.workspaceRootCwdLabel}`;
@@ -475,22 +476,22 @@ function renderControlCenterHtml(status, options = {}) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --oc-bg: #050505;
-      --oc-panel: #110d0c;
-      --oc-panel-strong: #17110f;
-      --oc-panel-soft: #1d1512;
-      --oc-border: #645041;
-      --oc-border-soft: rgba(220, 195, 170, 0.14);
-      --oc-text: #f7efe5;
-      --oc-text-dim: #dcc3aa;
-      --oc-text-soft: #aa9078;
-      --oc-accent: #d77757;
-      --oc-accent-bright: #f09464;
-      --oc-accent-soft: rgba(240, 148, 100, 0.18);
-      --oc-positive: #e8b86b;
-      --oc-warning: #f3c969;
-      --oc-critical: #ff8a6c;
-      --oc-focus: #ffd3a1;
+      --fc-bg: #050505;
+      --fc-panel: #110d0c;
+      --fc-panel-strong: #17110f;
+      --fc-panel-soft: #1d1512;
+      --fc-border: #645041;
+      --fc-border-soft: rgba(220, 195, 170, 0.14);
+      --fc-text: #f7efe5;
+      --fc-text-dim: #dcc3aa;
+      --fc-text-soft: #aa9078;
+      --fc-accent: #d77757;
+      --fc-accent-bright: #f09464;
+      --fc-accent-soft: rgba(240, 148, 100, 0.18);
+      --fc-positive: #e8b86b;
+      --fc-warning: #f3c969;
+      --fc-critical: #ff8a6c;
+      --fc-focus: #ffd3a1;
     }
     * {
       box-sizing: border-box;
@@ -505,7 +506,7 @@ function renderControlCenterHtml(status, options = {}) {
     body {
       padding: 16px;
       font-family: var(--vscode-font-family, "Segoe UI", sans-serif);
-      color: var(--oc-text);
+      color: var(--fc-text);
       background:
         radial-gradient(circle at top right, rgba(240, 148, 100, 0.16), transparent 34%),
         radial-gradient(circle at 20% 0%, rgba(215, 119, 87, 0.14), transparent 28%),
@@ -518,7 +519,7 @@ function renderControlCenterHtml(status, options = {}) {
     .shell {
       position: relative;
       overflow: hidden;
-      border: 1px solid var(--oc-border-soft);
+      border: 1px solid var(--fc-border-soft);
       border-radius: 20px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 16%),
@@ -548,8 +549,8 @@ function renderControlCenterHtml(status, options = {}) {
       border-radius: 16px;
       background:
         linear-gradient(135deg, rgba(240, 148, 100, 0.06), rgba(215, 119, 87, 0.02) 55%, transparent),
-        var(--oc-panel);
-      border: 1px solid var(--oc-border-soft);
+        var(--fc-panel);
+      border: 1px solid var(--fc-border-soft);
     }
     .hero-top {
       display: flex;
@@ -567,17 +568,17 @@ function renderControlCenterHtml(status, options = {}) {
       font-size: 11px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--oc-text-soft);
+      color: var(--fc-text-soft);
     }
     .wordmark {
       font-size: 24px;
       line-height: 1;
       font-weight: 700;
       letter-spacing: -0.03em;
-      color: var(--oc-text);
+      color: var(--fc-text);
     }
     .wordmark-accent {
-      color: var(--oc-accent-bright);
+      color: var(--fc-accent-bright);
     }
     .headline {
       display: grid;
@@ -587,11 +588,11 @@ function renderControlCenterHtml(status, options = {}) {
     .headline-title {
       font-size: 15px;
       font-weight: 600;
-      color: var(--oc-text);
+      color: var(--fc-text);
     }
     .headline-subtitle {
       font-size: 12px;
-      color: var(--oc-text-dim);
+      color: var(--fc-text-dim);
     }
     .status-rail {
       display: flex;
@@ -607,26 +608,26 @@ function renderControlCenterHtml(status, options = {}) {
       min-width: 94px;
       padding: 8px 10px;
       border-radius: 999px;
-      border: 1px solid var(--oc-border-soft);
+      border: 1px solid var(--fc-border-soft);
       background: rgba(255, 255, 255, 0.02);
     }
     .rail-label {
       font-size: 10px;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--oc-text-soft);
+      color: var(--fc-text-soft);
     }
     .rail-value {
       font-size: 12px;
       font-weight: 700;
-      color: var(--oc-text);
+      color: var(--fc-text);
     }
     .refresh-button {
       border: 1px solid rgba(240, 148, 100, 0.28);
       border-radius: 999px;
       padding: 8px 12px;
       background: rgba(240, 148, 100, 0.08);
-      color: var(--oc-text-dim);
+      color: var(--fc-text-dim);
       cursor: pointer;
       white-space: nowrap;
     }
@@ -641,8 +642,8 @@ function renderControlCenterHtml(status, options = {}) {
       min-width: 0;
       padding: 14px;
       border-radius: 14px;
-      background: var(--oc-panel-strong);
-      border: 1px solid var(--oc-border-soft);
+      background: var(--fc-panel-strong);
+      border: 1px solid var(--fc-border-soft);
     }
     .summary-label,
     .detail-label,
@@ -652,7 +653,7 @@ function renderControlCenterHtml(status, options = {}) {
       font-size: 10px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--oc-text-soft);
+      color: var(--fc-text-soft);
     }
     .summary-value,
     .detail-summary {
@@ -662,7 +663,7 @@ function renderControlCenterHtml(status, options = {}) {
       white-space: nowrap;
       font-size: 13px;
       font-weight: 600;
-      color: var(--oc-text);
+      color: var(--fc-text);
     }
     .summary-detail,
     .detail-meta,
@@ -671,7 +672,7 @@ function renderControlCenterHtml(status, options = {}) {
     .support-copy,
     .footer-note {
       font-size: 12px;
-      color: var(--oc-text-dim);
+      color: var(--fc-text-dim);
     }
     .modules {
       display: grid;
@@ -684,8 +685,8 @@ function renderControlCenterHtml(status, options = {}) {
       gap: 12px;
       padding: 16px;
       border-radius: 16px;
-      background: var(--oc-panel);
-      border: 1px solid var(--oc-border-soft);
+      background: var(--fc-panel);
+      border: 1px solid var(--fc-border-soft);
     }
     .detail-list,
     .action-stack,
@@ -713,8 +714,8 @@ function renderControlCenterHtml(status, options = {}) {
       gap: 12px;
       padding: 16px;
       border-radius: 16px;
-      background: var(--oc-panel);
-      border: 1px solid var(--oc-border-soft);
+      background: var(--fc-panel);
+      border: 1px solid var(--fc-border-soft);
     }
     .action-button {
       width: 100%;
@@ -725,7 +726,7 @@ function renderControlCenterHtml(status, options = {}) {
       border-radius: 14px;
       border: 1px solid rgba(220, 195, 170, 0.14);
       background: rgba(255, 255, 255, 0.02);
-      color: var(--oc-text);
+      color: var(--fc-text);
       cursor: pointer;
       transition: border-color 140ms ease, transform 140ms ease, background 140ms ease, box-shadow 140ms ease;
     }
@@ -753,7 +754,7 @@ function renderControlCenterHtml(status, options = {}) {
     .support-link-label {
       font-size: 13px;
       font-weight: 700;
-      color: var(--oc-text);
+      color: var(--fc-text);
     }
     .action-empty {
       display: grid;
@@ -781,24 +782,24 @@ function renderControlCenterHtml(status, options = {}) {
     }
     .tone-positive .rail-value,
     .tone-positive .detail-summary {
-      color: var(--oc-positive);
+      color: var(--fc-positive);
     }
     .tone-warning .rail-value,
     .tone-warning .detail-summary {
-      color: var(--oc-warning);
+      color: var(--fc-warning);
     }
     .tone-critical .rail-value,
     .tone-critical .detail-summary {
-      color: var(--oc-critical);
+      color: var(--fc-critical);
     }
     .tone-accent .rail-value,
     .tone-accent .detail-summary {
-      color: var(--oc-accent-bright);
+      color: var(--fc-accent-bright);
     }
     .action-button:focus-visible,
     .support-link:focus-visible,
     .refresh-button:focus-visible {
-      outline: 2px solid var(--oc-focus);
+      outline: 2px solid var(--fc-focus);
       outline-offset: 2px;
       box-shadow: 0 0 0 4px rgba(255, 211, 161, 0.16);
     }
@@ -807,7 +808,7 @@ function renderControlCenterHtml(status, options = {}) {
       border-radius: 999px;
       border: 1px solid rgba(240, 148, 100, 0.18);
       background: rgba(240, 148, 100, 0.08);
-      color: var(--oc-accent-bright);
+      color: var(--fc-accent-bright);
       font-family: var(--vscode-editor-font-family, Consolas, monospace);
       font-size: 11px;
     }
@@ -841,7 +842,7 @@ function renderControlCenterHtml(status, options = {}) {
         <div class="hero-top">
           <div class="brand">
             <div class="eyebrow">${escapeHtml(viewModel.header.eyebrow)}</div>
-            <div class="wordmark" aria-label="OpenClaude wordmark">Open<span class="wordmark-accent">Claude</span></div>
+            <div class="wordmark" aria-label="FreeCoding wordmark">Free<span class="wordmark-accent">Coding</span></div>
             <div class="headline">
               <h1 class="headline-title" id="control-center-title">${escapeHtml(viewModel.header.title)}</h1>
               <p class="headline-subtitle">${escapeHtml(viewModel.header.subtitle)}</p>
@@ -881,11 +882,11 @@ function renderControlCenterHtml(status, options = {}) {
             </button>
             <button class="support-link" id="repo" type="button">
               <span class="support-link-label">Open Repository</span>
-              <span class="summary-detail">Browse the upstream OpenClaude project.</span>
+              <span class="summary-detail">Browse the upstream FreeCoding project.</span>
             </button>
             <button class="support-link" id="commands" type="button">
               <span class="support-link-label">Open Command Palette</span>
-              <span class="summary-detail">Access VS Code and OpenClaude commands quickly.</span>
+              <span class="summary-detail">Access VS Code and FreeCoding commands quickly.</span>
             </button>
           </div>
         </section>
@@ -915,7 +916,7 @@ function renderControlCenterHtml(status, options = {}) {
 </html>`;
 }
 
-class OpenClaudeControlCenterProvider {
+class FreeCodingControlCenterProvider {
   constructor() {
     this.webviewView = null;
   }
@@ -933,10 +934,10 @@ class OpenClaudeControlCenterProvider {
     webviewView.webview.onDidReceiveMessage(async message => {
       switch (message?.type) {
         case 'launch':
-          await launchOpenClaude();
+          await launchFreeCoding();
           break;
         case 'launchRoot':
-          await launchOpenClaude({ requireWorkspace: true });
+          await launchFreeCoding({ requireWorkspace: true });
           break;
         case 'openProfile':
           await openWorkspaceProfile();
@@ -1045,7 +1046,7 @@ class OpenClaudeControlCenterProvider {
  */
 function activate(context) {
   // ── Control Center (existing) ──
-  const provider = new OpenClaudeControlCenterProvider();
+  const provider = new FreeCodingControlCenterProvider();
   const refreshProvider = () => {
     void provider.refresh();
   };
@@ -1058,8 +1059,8 @@ function activate(context) {
   }
 
   const chatController = new ChatController(sessionManager);
-  const chatViewProvider = new OpenClaudeChatViewProvider(chatController);
-  const chatPanelManager = new OpenClaudeChatPanelManager(chatController);
+  const chatViewProvider = new FreeCodingChatViewProvider(chatController);
+  const chatPanelManager = new FreeCodingChatPanelManager(chatController);
 
   // ── Diff content provider ──
   const diffProvider = new DiffContentProvider();
@@ -1073,73 +1074,73 @@ function activate(context) {
     vscode.StatusBarAlignment.Right,
     100,
   );
-  statusBarItem.text = '$(comment-discussion) OpenClaude';
-  statusBarItem.tooltip = 'Open OpenClaude Chat';
-  statusBarItem.command = 'openclaude.openChat';
+  statusBarItem.text = '$(comment-discussion) FreeCoding';
+  statusBarItem.tooltip = 'Open FreeCoding Chat';
+  statusBarItem.command = 'freecoding.openChat';
   statusBarItem.show();
 
   chatController.onDidChangeState((state) => {
     switch (state) {
       case 'streaming':
-        statusBarItem.text = '$(sync~spin) OpenClaude';
-        statusBarItem.tooltip = 'OpenClaude is generating...';
+        statusBarItem.text = '$(sync~spin) FreeCoding';
+        statusBarItem.tooltip = 'FreeCoding is generating...';
         break;
       case 'connected':
-        statusBarItem.text = '$(comment-discussion) OpenClaude';
-        statusBarItem.tooltip = 'OpenClaude connected';
+        statusBarItem.text = '$(comment-discussion) FreeCoding';
+        statusBarItem.tooltip = 'FreeCoding connected';
         break;
       default:
-        statusBarItem.text = '$(comment-discussion) OpenClaude';
-        statusBarItem.tooltip = 'Open OpenClaude Chat';
+        statusBarItem.text = '$(comment-discussion) FreeCoding';
+        statusBarItem.tooltip = 'Open FreeCoding Chat';
         break;
     }
   });
 
   // ── Existing commands ──
-  const startCommand = vscode.commands.registerCommand('openclaude.start', async () => {
-    await launchOpenClaude();
+  const startCommand = vscode.commands.registerCommand('freecoding.start', async () => {
+    await launchFreeCoding();
   });
 
   const startInWorkspaceRootCommand = vscode.commands.registerCommand(
-    'openclaude.startInWorkspaceRoot',
+    'freecoding.startInWorkspaceRoot',
     async () => {
-      await launchOpenClaude({ requireWorkspace: true });
+      await launchFreeCoding({ requireWorkspace: true });
     },
   );
 
-  const openDocsCommand = vscode.commands.registerCommand('openclaude.openDocs', async () => {
+  const openDocsCommand = vscode.commands.registerCommand('freecoding.openDocs', async () => {
     await vscode.env.openExternal(vscode.Uri.parse(OPENCLAUDE_REPO_URL));
   });
 
   const openSetupDocsCommand = vscode.commands.registerCommand(
-    'openclaude.openSetupDocs',
+    'freecoding.openSetupDocs',
     async () => {
       await vscode.env.openExternal(vscode.Uri.parse(OPENCLAUDE_SETUP_URL));
     },
   );
 
   const openWorkspaceProfileCommand = vscode.commands.registerCommand(
-    'openclaude.openWorkspaceProfile',
+    'freecoding.openWorkspaceProfile',
     async () => {
       await openWorkspaceProfile();
     },
   );
 
-  const openUiCommand = vscode.commands.registerCommand('openclaude.openControlCenter', async () => {
-    await vscode.commands.executeCommand('workbench.view.extension.openclaude');
+  const openUiCommand = vscode.commands.registerCommand('freecoding.openControlCenter', async () => {
+    await vscode.commands.executeCommand('workbench.view.extension.freecoding');
   });
 
   // ── New chat commands ──
-  const newChatCommand = vscode.commands.registerCommand('openclaude.newChat', () => {
+  const newChatCommand = vscode.commands.registerCommand('freecoding.newChat', () => {
     chatController.stopSession();
     chatController.broadcast({ type: 'session_cleared' });
   });
 
-  const openChatCommand = vscode.commands.registerCommand('openclaude.openChat', () => {
+  const openChatCommand = vscode.commands.registerCommand('freecoding.openChat', () => {
     chatPanelManager.openPanel();
   });
 
-  const resumeSessionCommand = vscode.commands.registerCommand('openclaude.resumeSession', async () => {
+  const resumeSessionCommand = vscode.commands.registerCommand('freecoding.resumeSession', async () => {
     const sessions = await sessionManager.listSessions();
     if (sessions.length === 0) {
       await vscode.window.showInformationMessage('No sessions found to resume.');
@@ -1161,18 +1162,18 @@ function activate(context) {
     }
   });
 
-  const abortChatCommand = vscode.commands.registerCommand('openclaude.abortChat', () => {
+  const abortChatCommand = vscode.commands.registerCommand('freecoding.abortChat', () => {
     chatController.abort();
   });
 
   // ── Register providers ──
   const controlCenterProviderReg = vscode.window.registerWebviewViewProvider(
-    'openclaude.controlCenter',
+    'freecoding.controlCenter',
     provider,
   );
 
   const chatViewProviderReg = vscode.window.registerWebviewViewProvider(
-    'openclaude.chat',
+    'freecoding.chat',
     chatViewProvider,
     { webviewOptions: { retainContextWhenHidden: true } },
   );
@@ -1199,7 +1200,7 @@ function activate(context) {
     // watchers
     profileWatcher,
     vscode.workspace.onDidChangeConfiguration(event => {
-      if (event.affectsConfiguration('openclaude')) {
+      if (event.affectsConfiguration('freecoding')) {
         refreshProvider();
       }
     }),
@@ -1226,10 +1227,10 @@ function deactivate() {}
 module.exports = {
   activate,
   deactivate,
-  OpenClaudeControlCenterProvider,
+  FreeCodingControlCenterProvider,
   renderControlCenterHtml,
   resolveLaunchTargets,
   ChatController,
-  OpenClaudeChatViewProvider,
-  OpenClaudeChatPanelManager,
+  FreeCodingChatViewProvider,
+  FreeCodingChatPanelManager,
 };

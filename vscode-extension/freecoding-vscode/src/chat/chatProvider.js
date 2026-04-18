@@ -25,8 +25,8 @@ async function openFileInEditor(filePath) {
 }
 
 function getLaunchConfig() {
-  const cfg = vscode.workspace.getConfiguration('openclaude');
-  const command = cfg.get('launchCommand', 'openclaude');
+  const cfg = vscode.workspace.getConfiguration('freecoding');
+  const command = cfg.get('launchCommand', 'freecoding');
   const shimEnabled = cfg.get('useOpenAIShim', false);
   const permissionMode = cfg.get('permissionMode', 'acceptEdits');
   const env = {};
@@ -458,7 +458,7 @@ class ChatController {
   }
 }
 
-class OpenClaudeChatViewProvider {
+class FreeCodingChatViewProvider {
   constructor(chatController) {
     this._chatController = chatController;
     this._webviewView = null;
@@ -553,7 +553,7 @@ class OpenClaudeChatViewProvider {
   }
 }
 
-class OpenClaudeChatPanelManager {
+class FreeCodingChatPanelManager {
   constructor(chatController) {
     this._chatController = chatController;
     this._panel = null;
@@ -566,8 +566,8 @@ class OpenClaudeChatPanelManager {
     }
 
     this._panel = vscode.window.createWebviewPanel(
-      'openclaude.chatPanel',
-      'OpenClaude Chat',
+      'freecoding.chatPanel',
+      'FreeCoding Chat',
       vscode.ViewColumn.Beside,
       {
         enableScripts: true,
@@ -671,6 +671,6 @@ class OpenClaudeChatPanelManager {
 
 module.exports = {
   ChatController,
-  OpenClaudeChatViewProvider,
-  OpenClaudeChatPanelManager,
+  FreeCodingChatViewProvider,
+  FreeCodingChatPanelManager,
 };

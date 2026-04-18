@@ -32,7 +32,7 @@ export function optionForPermissionSaveDestination(saveDestination: EditableSett
     case 'userSettings':
       return {
         label: 'User settings',
-        description: `Saved in ~/.openclaude/settings.json`,
+        description: `Saved in ~/.freecoding/settings.json`,
         value: saveDestination
       };
   }

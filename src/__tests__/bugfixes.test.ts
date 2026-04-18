@@ -1,5 +1,5 @@
 /**
- * Tests for Bug Fixes applied to openclaude.
+ * Tests for Bug Fixes applied to freecoding.
  *
  * Covers:
  * 1. Gemini `store: false` rejection fix

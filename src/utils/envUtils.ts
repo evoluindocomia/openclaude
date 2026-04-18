@@ -14,29 +14,31 @@ export function resolveClaudeConfigHomeDir(options?: {
   }
 
   const homeDir = options?.homeDir ?? homedir()
+  const freeCodingDir = join(homeDir, '.freecoding')
   const openClaudeDir = join(homeDir, '.openclaude')
   const legacyClaudeDir = join(homeDir, '.claude')
-  const openClaudeExists =
-    options?.openClaudeExists ?? existsSync(openClaudeDir)
+  const freeCodingExists = options?.openClaudeExists ?? existsSync(freeCodingDir)
+  const openClaudeExists = existsSync(openClaudeDir)
   const legacyClaudeExists =
     options?.legacyClaudeExists ?? existsSync(legacyClaudeDir)
 
-  // Preserve existing user config/install state until we ship an explicit
-  // migration. New installs (neither path exists) use ~/.openclaude.
-  if (!openClaudeExists && legacyClaudeExists) {
-    return legacyClaudeDir.normalize('NFC')
-  }
+  // Prioritize .freecoding
+  if (freeCodingExists) return freeCodingDir.normalize('NFC')
+  
+  // Legacy fallback: .openclaude or .claude
+  if (openClaudeExists) return openClaudeDir.normalize('NFC')
+  if (legacyClaudeExists) return legacyClaudeDir.normalize('NFC')
 
-  return openClaudeDir.normalize('NFC')
+  return freeCodingDir.normalize('NFC')
 }
 
 // Memoized: 150+ callers, many on hot paths. Keyed off CLAUDE_CONFIG_DIR so
 // tests that change the env var get a fresh value without explicit cache.clear.
 export const getClaudeConfigHomeDir = memoize(
   (): string => resolveClaudeConfigHomeDir({
-    configDirEnv: process.env.CLAUDE_CONFIG_DIR,
+    configDirEnv: process.env.FREECODING_CONFIG_DIR || process.env.OPENCLAUDE_CONFIG_DIR || process.env.CLAUDE_CONFIG_DIR,
   }),
-  () => process.env.CLAUDE_CONFIG_DIR,
+  () => process.env.FREECODING_CONFIG_DIR || process.env.OPENCLAUDE_CONFIG_DIR || process.env.CLAUDE_CONFIG_DIR,
 )
 
 export function getTeamsDir(): string {
@@ -85,6 +87,8 @@ export function isEnvDefinedFalsy(
  */
 export function isBareMode(): boolean {
   return (
+    isEnvTruthy(process.env.FREECODING_SIMPLE) ||
+    isEnvTruthy(process.env.OPENCLAUDE_SIMPLE) ||
     isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE) ||
     process.argv.includes('--bare')
   )
@@ -135,7 +139,10 @@ export function getDefaultVertexRegion(): string {
  * @returns true if CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR is set to a truthy value
  */
 export function shouldMaintainProjectWorkingDir(): boolean {
-  return isEnvTruthy(process.env.CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR)
+  return (
+    isEnvTruthy(process.env.FREECODING_BASH_MAINTAIN_PROJECT_WORKING_DIR) ||
+    isEnvTruthy(process.env.CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR)
+  )
 }
 
 /**

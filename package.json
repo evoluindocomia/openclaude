@@ -1,10 +1,10 @@
 {
-  "name": "@gitlawb/openclaude",
+  "name": "@evoluindocomia/affhub-freecoding",
   "version": "0.3.0",
   "description": "Claude Code opened to any LLM — OpenAI, Gemini, DeepSeek, Ollama, and 200+ models",
   "type": "module",
   "bin": {
-    "openclaude": "./bin/openclaude"
+    "freecoding": "./bin/freecoding"
   },
   "files": [
     "bin/",
@@ -140,7 +140,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Gitlawb/openclaude.git"
+    "url": "https://github.com/evoluindocomia/affhub-freecoding.git"
   },
   "keywords": [
     "claude-code",

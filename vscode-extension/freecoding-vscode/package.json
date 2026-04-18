@@ -1,0 +1,179 @@
+{
+  "name": "freecoding-vscode",
+  "displayName": "FreeCoding",
+  "description": "Practical VS Code companion for FreeCoding with project-aware launch behavior and a real Control Center.",
+  "version": "0.2.0",
+  "publisher": "affhub",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:freecoding.start",
+    "onCommand:freecoding.startInWorkspaceRoot",
+    "onCommand:freecoding.openDocs",
+    "onCommand:freecoding.openSetupDocs",
+    "onCommand:freecoding.openWorkspaceProfile",
+    "onCommand:freecoding.openControlCenter",
+    "onCommand:freecoding.newChat",
+    "onCommand:freecoding.openChat",
+    "onCommand:freecoding.resumeSession",
+    "onCommand:freecoding.abortChat",
+    "onView:freecoding.controlCenter",
+    "onView:freecoding.chat"
+  ],
+  "main": "./src/extension.js",
+  "files": [
+    "README.md",
+    "media/**",
+    "src/extension.js",
+    "src/presentation.js",
+    "src/state.js",
+    "src/chat/**",
+    "themes/**"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "freecoding.start",
+        "title": "FreeCoding: Launch in Terminal",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.startInWorkspaceRoot",
+        "title": "FreeCoding: Launch in Workspace Root",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.openDocs",
+        "title": "FreeCoding: Open Repository",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.openSetupDocs",
+        "title": "FreeCoding: Open Setup Guide",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.openWorkspaceProfile",
+        "title": "FreeCoding: Open Workspace Profile",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.openControlCenter",
+        "title": "FreeCoding: Open Control Center",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.newChat",
+        "title": "FreeCoding: New Chat",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.openChat",
+        "title": "FreeCoding: Open Chat Panel",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.resumeSession",
+        "title": "FreeCoding: Resume Session",
+        "category": "FreeCoding"
+      },
+      {
+        "command": "freecoding.abortChat",
+        "title": "FreeCoding: Abort Generation",
+        "category": "FreeCoding"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "freecoding",
+          "title": "FreeCoding",
+          "icon": "media/freecoding.svg"
+        }
+      ]
+    },
+    "views": {
+      "freecoding": [
+        {
+          "id": "freecoding.chat",
+          "name": "Chat",
+          "type": "webview"
+        },
+        {
+          "id": "freecoding.controlCenter",
+          "name": "Control Center",
+          "type": "webview"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "freecoding.openChat",
+        "key": "ctrl+shift+l",
+        "mac": "cmd+shift+l"
+      }
+    ],
+    "configuration": {
+      "title": "FreeCoding",
+      "properties": {
+        "freecoding.launchCommand": {
+          "type": "string",
+          "default": "freecoding",
+          "description": "Command run in the integrated terminal when launching FreeCoding."
+        },
+        "freecoding.terminalName": {
+          "type": "string",
+          "default": "FreeCoding",
+          "description": "Integrated terminal tab name for FreeCoding sessions."
+        },
+        "freecoding.useOpenAIShim": {
+          "type": "boolean",
+          "default": false,
+          "description": "Optionally set FREECODING_USE_OPENAI=1 in launched FreeCoding terminals."
+        },
+        "freecoding.permissionMode": {
+          "type": "string",
+          "default": "acceptEdits",
+          "enum": ["default", "acceptEdits", "bypassPermissions", "plan"],
+          "enumDescriptions": [
+            "Prompt for permission on each tool use (requires manual approval)",
+            "Auto-approve file edits, prompt for other operations (recommended)",
+            "Auto-approve all operations without prompting",
+            "Read-only mode — no file modifications allowed"
+          ],
+          "description": "Permission mode for chat sessions. Controls which tool operations are auto-approved."
+        }
+      }
+    },
+    "themes": [
+      {
+        "label": "FreeCoding Terminal Black",
+        "uiTheme": "vs-dark",
+        "path": "./themes/FreeCoding-Terminal-Black.json"
+      }
+    ]
+  },
+  "scripts": {
+    "test": "node --test ./src/*.test.js",
+    "lint": "node scripts/lint.js",
+    "package": "npx @vscode/vsce package --no-dependencies"
+  },
+  "keywords": [
+    "freecoding",
+    "terminal",
+    "theme",
+    "cli",
+    "llm"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evoluindocomia/affhub-freecoding"
+  },
+  "license": "MIT"
+}
